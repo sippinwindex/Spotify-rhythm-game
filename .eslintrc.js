@@ -17,13 +17,11 @@ module.exports = {
     'no-console': 'warn',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     'react/no-unescaped-entities': 'off',
-
     'react/display-name': 'off',
     'react/jsx-curly-brace-presence': [
       'warn',
       { props: 'never', children: 'never' },
     ],
-
     //#region  //*=========== Unused Import ===========
     '@typescript-eslint/no-unused-vars': 'off',
     'unused-imports/no-unused-imports': 'warn',
@@ -37,7 +35,6 @@ module.exports = {
       },
     ],
     //#endregion  //*======== Unused Import ===========
-
     //#region  //*=========== Import Sort ===========
     'simple-import-sort/exports': 'warn',
     'simple-import-sort/imports': [
@@ -45,7 +42,7 @@ module.exports = {
       {
         groups: [
           // ext library & side effect imports
-          ['^@?\\w', '^\\u0000'],
+          ['^@?\\w', '^'],
           // {s}css files
           ['^.+\\.s?css$'],
           // Lib and hooks
@@ -64,10 +61,10 @@ module.exports = {
             '^\\.(?!/?$)',
             '^\\.\\./?$',
             '^\\.\\.(?!/?$)',
-            '^\\.\\./\\.\\./?$',
-            '^\\.\\./\\.\\.(?!/?$)',
-            '^\\.\\./\\.\\./\\.\\./?$',
-            '^\\.\\./\\.\\./\\.\\.(?!/?$)',
+            '^\\.\\../\\.\\./?$',
+            '^\\.\\../\\.\\.(?!/?$)',
+            '^\\.\\../\\.\\../\\.\\./?$',
+            '^\\.\\../\\.\\../\\.\\.(?!/?$)',
           ],
           ['^@/types'],
           // other that didnt fit in
@@ -81,4 +78,12 @@ module.exports = {
     React: true,
     JSX: true,
   },
+  overrides: [
+    {
+      files: ['*.d.ts'],
+      rules: {
+        'unused-imports/no-unused-imports': 'off',
+      },
+    },
+  ],
 };

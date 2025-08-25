@@ -1,68 +1,55 @@
 'use client';
 
-import * as React from 'react';
-import '@/lib/env';
+import { signIn, useSession } from 'next-auth/react';
+import React, { useEffect, useState } from 'react';
 
-import ArrowLink from '@/components/links/ArrowLink';
-import ButtonLink from '@/components/links/ButtonLink';
-import UnderlineLink from '@/components/links/UnderlineLink';
-import UnstyledLink from '@/components/links/UnstyledLink';
+import { getAccessToken } from '@/lib/spotify';
 
-/**
- * SVGR Support
- * Caveat: No React Props Type.
- *
- * You can override the next-env if the type is important to you
- * @see https://stackoverflow.com/questions/68103844/how-to-override-next-js-svg-module-declaration
- */
-import Logo from '~/svg/Logo.svg';
+import RhythmGame from '@/components/RhythmGame';
+import WebPlayback from '@/components/WebPlayback';
 
-// !STARTERCONF -> Select !STARTERCONF and CMD + SHIFT + F
-// Before you begin editing, follow all comments with `STARTERCONF`,
-// to customize the default configuration.
+const Home: React.FC = () => {
+  const { data: session } = useSession();
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [currentTrack, setCurrentTrack] = useState<Spotify.Track | null>(null);
 
-export default function HomePage() {
+  useEffect(() => {
+    if (session) {
+      const fetchToken = async () => {
+        const token = await getAccessToken();
+        setAccessToken(token);
+      };
+      fetchToken();
+    }
+  }, [session]);
+
   return (
-    <main>
-      <section className='bg-white'>
-        <div className='layout relative flex min-h-screen flex-col items-center justify-center py-12 text-center'>
-          <Logo className='w-16' />
-          <h1 className='mt-4'>Next.js + Tailwind CSS + TypeScript Starter</h1>
-          <p className='mt-2 text-sm text-gray-800'>
-            A starter for Next.js, Tailwind CSS, and TypeScript with Absolute
-            Import, Seo, Link component, pre-configured with Husky{' '}
-          </p>
-          <p className='mt-2 text-sm text-gray-700'>
-            <ArrowLink href='https://github.com/theodorusclarence/ts-nextjs-tailwind-starter'>
-              See the repository
-            </ArrowLink>
-          </p>
-
-          <ButtonLink className='mt-6' href='/components' variant='light'>
-            See all components
-          </ButtonLink>
-
-          <UnstyledLink
-            href='https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Ftheodorusclarence%2Fts-nextjs-tailwind-starter'
-            className='mt-4'
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              width='92'
-              height='32'
-              src='https://vercel.com/button'
-              alt='Deploy with Vercel'
-            />
-          </UnstyledLink>
-
-          <footer className='absolute bottom-2 text-gray-700'>
-            © {new Date().getFullYear()} By{' '}
-            <UnderlineLink href='https://theodorusclarence.com?ref=tsnextstarter'>
-              Theodorus Clarence
-            </UnderlineLink>
-          </footer>
-        </div>
-      </section>
-    </main>
+    <div className='container mx-auto p-4'>
+      {session ? (
+        <>
+          {accessToken && (
+            <>
+              <WebPlayback
+                token={accessToken}
+                setCurrentTrack={setCurrentTrack}
+              />
+              <RhythmGame
+                token={accessToken}
+                currentTrack={currentTrack ? currentTrack.id : null}
+              />
+            </>
+          )}
+        </>
+      ) : (
+        <button
+          onClick={() => signIn('spotify')}
+          className='bg-green-500 text-white px-4 py-2 rounded'
+        >
+          Login with Spotify
+        </button>
+      )}
+    </div>
   );
-}
+};
+
+export default Home;
